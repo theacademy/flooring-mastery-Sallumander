@@ -1,0 +1,2 @@
+OrderNumber,CustomerName,State,TaxRate,ProductType,Area,CostPerSquareFoot,LaborCostPerSquareFoot,MaterialCost,LaborCost,Tax,Total
+1,Callum Coulter,CA,25.00,Tile,249.00,3.50,4.15,871.5000,1033.3500,476.212500,2381.062500

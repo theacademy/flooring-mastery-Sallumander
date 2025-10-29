@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.*;
 import java.math.BigDecimal;
+import java.util.stream.Collectors;
 
 @Service
 public class ServiceLayerImpl implements ServiceLayer {
@@ -115,13 +116,15 @@ public class ServiceLayerImpl implements ServiceLayer {
         List<String> states=getAllStateAbbrs();
         return states.contains(stateAbbr);
     }
+    
     //get List of every state Abbr
     public List<String> getAllStateAbbrs() throws PersistenceException{
         List<String> states=new ArrayList<>();
         List<Tax> taxes=taxDao.getAllTaxes();
-        for (Tax tax : taxes) {
-            states.add(tax.getStateAbbr());
-        }
+        states=taxes.stream()
+                .map(Tax::getStateAbbr)
+                .sorted()
+                .collect(Collectors.toList());
         return states;
     }
 
@@ -132,9 +135,11 @@ public class ServiceLayerImpl implements ServiceLayer {
         }
         List<String> productTypes=new ArrayList<>();
         List<Product>products=productDao.getAllProducts();
-        for(Product product : products) {
-            productTypes.add(product.getProductType().toLowerCase());
-        }
+        productTypes=products.stream()
+                .map(Product::getProductType)
+                .sorted()
+                .map(String::toLowerCase)
+                .collect(Collectors.toList());
         return productTypes;
     }
 

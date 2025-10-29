@@ -127,10 +127,14 @@ public class Controller {
 
                 String newState = view.readStringAllowEmpty("Enter new state (" + existingOrder.getState() + "): ");
                 if (!newState.trim().isEmpty()) {
+                    // normalize to upper-case because tax state abbreviations are stored upper-case
+                    newState = newState.toUpperCase();
                     if (service.isValidState(newState)) {
                         existingOrder.setState(newState);
                     } else {
                         view.displayMessage("Invalid or unsupported state abbreviation.");
+                        // clear newState so we don't overwrite later
+                        newState = "";
                     }
                 }
 
@@ -158,13 +162,7 @@ public class Controller {
                 }
 
 
-                // Update only provided fields
-                if (!newName.trim().isEmpty()) existingOrder.setCustomerName(newName);
-                if (!newState.trim().isEmpty()) existingOrder.setState(newState);
-                if (!newProduct.trim().isEmpty()) existingOrder.setProductType(newProduct);
-                if (!newAreaStr.trim().isEmpty()) {
-                    existingOrder.setArea(new BigDecimal(newAreaStr));
-                }
+                // Note: fields were already updated above only when valid; no further unconditional overwrites.
 
                 // Recalculate costs & totals
                 Order newOrder=new Order(existingOrder);

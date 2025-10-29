@@ -4,27 +4,29 @@ import com.flooring.flooringmastery.dao.OrderDaoFileImpl;
 import com.flooring.flooringmastery.view.UserIOConsoleImpl;
 import com.flooring.flooringmastery.model.Order;
 import com.flooring.flooringmastery.exceptions.PersistenceException;
-import org.junit.jupiter.api.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import java.math.BigDecimal;
 import java.nio.file.*;
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.*;
 
 class OrderDaoFileImplTest {
 
     private OrderDaoFileImpl dao;
     private final LocalDate date = LocalDate.of(2025, 10, 29);
 
-    @BeforeEach
-    void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         dao = new OrderDaoFileImpl(new UserIOConsoleImpl());
         // Optional: clear or reset in-memory map for test isolation
         Files.createDirectories(Paths.get("FileData/Orders"));
     }
 
     @Test
-    void testAddAndGetOrder() throws PersistenceException {
+    public void testAddAndGetOrder() throws PersistenceException {
         Order order = new Order();
         order.setOrderNumber(1);
         order.setCustomerName("Test Customer");
@@ -47,14 +49,14 @@ class OrderDaoFileImplTest {
     }
 
     @Test
-    void testRemoveOrder() throws PersistenceException {
+    public void testRemoveOrder() throws PersistenceException {
 
         dao.removeOrder(date, 1);
         assertNull(dao.getOrder(date, 1));
     }
 
     @Test
-    void testRemoveLastOrderDeletesFile() throws Exception {
+    public void testRemoveLastOrderDeletesFile() throws Exception {
         // Ensure a clean file state
         Path filePath = Paths.get("FileData/Orders/Orders_" + date.format(java.time.format.DateTimeFormatter.ofPattern("MMddyyyy")) + ".txt");
         if (Files.exists(filePath)) Files.delete(filePath);

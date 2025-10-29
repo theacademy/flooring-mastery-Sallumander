@@ -26,7 +26,12 @@
         <java.version>17</java.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
+        <!-- JUnit version used for tests -->
+        <junit.jupiter.version>5.10.2</junit.jupiter.version>
     </properties>
+
+
+    <!-- (removed junit BOM to simplify IDE resolution; using explicit version property instead) -->
 
     <!-- Dependencies -->
     <dependencies>
@@ -37,21 +42,20 @@
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
 
-        <!-- For Logging (already part of starter but kept explicit for clarity) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
         </dependency>
 
-        <!-- JUnit 5 -->
+        <!-- JUnit 5 (explicit version from property) -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.10.0</version>
+            <version>${junit.jupiter.version}</version>
             <scope>test</scope>
         </dependency>
 
-        <!-- Spring Boot Test (includes SpringExtension, MockBeans, etc.) -->
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -60,17 +64,25 @@
 
     </dependencies>
 
-    <!-- Build Plugins -->
     <build>
         <plugins>
 
-            <!-- Spring Boot plugin -->
+
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
 
-            <!-- Surefire plugin for JUnit 5 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <release>17</release>
+                </configuration>
+            </plugin>
+
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>

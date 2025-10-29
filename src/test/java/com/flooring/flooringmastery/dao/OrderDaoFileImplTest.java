@@ -1,6 +1,7 @@
 package com.flooring.flooringmastery.dao;
 
 import com.flooring.flooringmastery.dao.OrderDaoFileImpl;
+import com.flooring.flooringmastery.view.UserIOConsoleImpl;
 import com.flooring.flooringmastery.model.Order;
 import com.flooring.flooringmastery.exceptions.PersistenceException;
 import org.junit.jupiter.api.*;
@@ -17,7 +18,7 @@ class OrderDaoFileImplTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        dao = new OrderDaoFileImpl();
+        dao = new OrderDaoFileImpl(new UserIOConsoleImpl());
         // Optional: clear or reset in-memory map for test isolation
         Files.createDirectories(Paths.get("FileData/Orders"));
     }

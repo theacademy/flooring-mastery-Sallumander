@@ -1,6 +1,7 @@
 package com.flooring.flooringmastery.controller;
 
 import com.flooring.flooringmastery.exceptions.PersistenceException;
+import com.flooring.flooringmastery.exceptions.NoSuchOrderException;
 import com.flooring.flooringmastery.model.Order;
 import com.flooring.flooringmastery.service.ServiceLayer;
 import com.flooring.flooringmastery.view.View;
@@ -108,13 +109,8 @@ public class Controller {
             int orderNum = view.readInt("Enter order number to edit: ");
 
             try {
-                // Get existing order
+                // Get existing order (service will throw NoSuchOrderException if not found)
                 Order existingOrder = service.getOrder(date, orderNum);
-
-                if (existingOrder == null) {
-                    view.displayMessage("No order found for that date and number.");
-                    return;
-                }
 
                 //Display current info
                 view.displayOrder(existingOrder);
@@ -184,6 +180,8 @@ public class Controller {
                     view.displayMessage("Changes discarded.");
                 }
 
+            } catch (NoSuchOrderException e) {
+                view.displayMessage("No order found: " + e.getMessage());
             } catch (PersistenceException e) {
                 view.displayMessage("Error accessing order data: " + e.getMessage());
             }
@@ -196,20 +194,16 @@ public class Controller {
 
         try {
             Order order = service.getOrder(date, orderNumber);
-
-            if (order == null) {
-                view.displayMessage("No order found for that date and number.");
-                return;
-            }
-
             view.displayOrder(order);
-        
+
             if (view.readYesNo("Are you sure you want to delete this order? (Y/N): ")) {
                 service.removeOrder(date, orderNumber);
                 view.displayMessage("Order successfully removed.");
             } else {
                 view.displayMessage("Deletion cancelled.");
             }
+        } catch (NoSuchOrderException e) {
+            view.displayMessage("No order found: " + e.getMessage());
         } catch (PersistenceException e) {
             view.displayMessage("Error removing order: " + e.getMessage());
         }

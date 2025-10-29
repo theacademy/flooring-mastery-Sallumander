@@ -2,15 +2,12 @@ package com.flooring.flooringmastery.dao;
 
 import com.flooring.flooringmastery.model.Order;
 import com.flooring.flooringmastery.exceptions.PersistenceException;
+import com.flooring.flooringmastery.view.UserIO;
 import org.springframework.stereotype.Repository;
 
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -23,11 +20,17 @@ public class OrderDaoFileImpl implements OrderDao {
     private static final DateTimeFormatter FILE_DATE = DateTimeFormatter.ofPattern("MMddyyyy");
 
     private final Map<LocalDate, Map<Integer, Order>> ordersByDate = new HashMap<>();
+    private final UserIO userIO;
 
-    public OrderDaoFileImpl() {
+    public OrderDaoFileImpl(UserIO userIO) {
+        this.userIO = userIO;
         try{
+            // ensure directory exists
+            this.userIO.createDirectories(ORDER_FOLDER);
             loadAllOrders();
         } catch (PersistenceException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -93,16 +96,15 @@ public class OrderDaoFileImpl implements OrderDao {
         if (ordersByDate.containsKey(date)) return;
 
         String fileName = ORDER_FOLDER + "Orders_" + date.format(FILE_DATE) + ".txt";
-        Path path = Paths.get(fileName);
-
-        if (!Files.exists(path)) {
-            ordersByDate.put(date, new HashMap<>());
-            return;
-        }
 
         try {
-            List<String> lines = Files.readAllLines(path);
-            lines.remove(0); // remove header
+            if (!userIO.exists(fileName)) {
+                ordersByDate.put(date, new HashMap<>());
+                return;
+            }
+
+            List<String> lines = userIO.readAllLines(fileName);
+            if (!lines.isEmpty()) lines.remove(0); // remove header
 
             Map<Integer, Order> orders = new HashMap<>();
             for (String line : lines) {
@@ -219,13 +221,13 @@ public class OrderDaoFileImpl implements OrderDao {
     }
     private void writeOrdersForDate(LocalDate date) throws PersistenceException {
         String fileName = "Orders_" + date.format(FILE_DATE) + ".txt";
-        Path path = Paths.get(ORDER_FOLDER, fileName);
+        String filePath = ORDER_FOLDER + fileName;
         Map<Integer, Order> orders = ordersByDate.get(date);
 
         // If there are no orders for the date, delete the file if it exists.
         if (orders == null || orders.isEmpty()) {
             try {
-                Files.deleteIfExists(path);
+                userIO.deleteIfExists(filePath);
             } catch (IOException e) {
                 throw new PersistenceException("Could not delete empty orders file for date " + date, e);
             }
@@ -275,7 +277,7 @@ public class OrderDaoFileImpl implements OrderDao {
 
         try {
             // Write all lines to the file (overwrites if exists)
-            Files.write(path, lines);
+            userIO.writeLines(filePath, lines);
         } catch (IOException e) {
             throw new PersistenceException("Could not write orders file for date " + date, e);
         }

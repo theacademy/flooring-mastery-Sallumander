@@ -2,6 +2,7 @@ package com.flooring.flooringmastery.dao;
 
 import com.flooring.flooringmastery.exceptions.PersistenceException;
 import com.flooring.flooringmastery.model.Tax;
+import com.flooring.flooringmastery.view.UserIOConsoleImpl;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -12,7 +13,7 @@ class TaxDaoFileImplTest {
 
     @Test
     void testGetTaxByState() throws PersistenceException {
-        TaxDaoFileImpl dao = new TaxDaoFileImpl();
+    TaxDaoFileImpl dao = new TaxDaoFileImpl(new UserIOConsoleImpl());
         Tax tx = dao.getTaxByState("TX");
         assertNotNull(tx, "TX tax should be present in Taxes.txt");
         assertEquals("TX", tx.getStateAbbr());
@@ -21,7 +22,7 @@ class TaxDaoFileImplTest {
 
     @Test
     void testGetAllTaxes() throws PersistenceException {
-        TaxDaoFileImpl dao = new TaxDaoFileImpl();
+    TaxDaoFileImpl dao = new TaxDaoFileImpl(new UserIOConsoleImpl());
         assertTrue(dao.getAllTaxes().size() >= 1);
     }
 }

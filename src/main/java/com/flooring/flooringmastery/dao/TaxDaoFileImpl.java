@@ -2,11 +2,11 @@ package com.flooring.flooringmastery.dao;
 
 import com.flooring.flooringmastery.model.Tax;
 import com.flooring.flooringmastery.exceptions.PersistenceException;
+import com.flooring.flooringmastery.view.UserIO;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.file.*;
 import java.util.*;
 
 @Repository
@@ -17,8 +17,10 @@ public class TaxDaoFileImpl implements TaxDao {
     private static final String DELIMITER = ",";
 
     private final Map<String, Tax> taxes = new HashMap<>();
+    private final UserIO userIO;
 
-    public TaxDaoFileImpl() {
+    public TaxDaoFileImpl(UserIO userIO) {
+        this.userIO = userIO;
         try{
             loadTaxes();
         } catch (PersistenceException e) {
@@ -44,8 +46,8 @@ public class TaxDaoFileImpl implements TaxDao {
 
     private void loadTaxes() throws PersistenceException {
         try {
-            List<String> lines = Files.readAllLines(Paths.get(TAX_FILE));
-            lines.remove(0);
+            List<String> lines = userIO.readAllLines(TAX_FILE);
+            if (!lines.isEmpty()) lines.remove(0);
 
             for (String line : lines) {
                 String[] tokens = line.split(DELIMITER);

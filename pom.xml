@@ -43,10 +43,6 @@
             <artifactId>spring-boot-starter-logging</artifactId>
         </dependency>
 
-        <!-- ======================== -->
-        <!-- ===== TESTING AREA ===== -->
-        <!-- ======================== -->
-
         <!-- JUnit 5 -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

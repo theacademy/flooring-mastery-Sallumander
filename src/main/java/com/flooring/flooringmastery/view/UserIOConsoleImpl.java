@@ -1,8 +1,15 @@
 package com.flooring.flooringmastery.view;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Scanner;
 import java.util.List;
+import java.util.ArrayList;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.springframework.stereotype.Component;
 
 
@@ -10,9 +17,11 @@ import org.springframework.stereotype.Component;
 public class UserIOConsoleImpl implements UserIO {
 
     private final Scanner console = new Scanner(System.in);
+
     public void print(String message){
         System.out.println(message);
     }
+
     public String readString(String prompt){
         System.out.print(prompt);
         String input = console.nextLine();
@@ -22,6 +31,7 @@ public class UserIOConsoleImpl implements UserIO {
         }
         return input;
     }
+
     public int readInt(String prompt){
         System.out.print(prompt);
         while(true){
@@ -34,6 +44,7 @@ public class UserIOConsoleImpl implements UserIO {
         }
 
     }
+
     public int readInt(String prompt, int min, int max){
         System.out.print(prompt);
         while(true){
@@ -50,6 +61,7 @@ public class UserIOConsoleImpl implements UserIO {
             }
         }
     }
+
     public boolean readYesNo(String prompt){
         List<String> yesNo = List.of("y", "yes", "n", "no");
         String answer;
@@ -66,6 +78,7 @@ public class UserIOConsoleImpl implements UserIO {
         }
 
     }
+
     public BigDecimal readBigDecimal(String prompt){
         System.out.print(prompt);
         while(true){
@@ -77,6 +90,7 @@ public class UserIOConsoleImpl implements UserIO {
             }
         }
     }
+
     public BigDecimal readBigDecimal(String prompt, BigDecimal min){
         System.out.print(prompt);
         while(true){
@@ -93,6 +107,7 @@ public class UserIOConsoleImpl implements UserIO {
             }
         }
     }
+
     public LocalDate readDate(String prompt){
         System.out.print(prompt);
         while(true){
@@ -104,9 +119,41 @@ public class UserIOConsoleImpl implements UserIO {
 
         }
     }
+
     //used for edit so empty string will be allowed
     public String readStringAllowEmpty(String prompt){
         System.out.print(prompt);
         return console.nextLine();
+    }
+
+    // File helper implementations
+    @Override
+    public List<String> readAllLines(String path) throws IOException {
+        Path p = Paths.get(path);
+        if (!Files.exists(p)) return new ArrayList<>();
+        return Files.readAllLines(p);
+    }
+
+    @Override
+    public void writeLines(String path, List<String> lines) throws IOException {
+        Path p = Paths.get(path);
+        if (p.getParent() != null) Files.createDirectories(p.getParent());
+        Files.write(p, lines);
+    }
+
+    @Override
+    public boolean exists(String path) throws IOException {
+        return Files.exists(Paths.get(path));
+    }
+
+    @Override
+    public void deleteIfExists(String path) throws IOException {
+        Files.deleteIfExists(Paths.get(path));
+    }
+
+    @Override
+    public void createDirectories(String dirPath) throws IOException {
+        Path p = Paths.get(dirPath);
+        if (!Files.exists(p)) Files.createDirectories(p);
     }
 }

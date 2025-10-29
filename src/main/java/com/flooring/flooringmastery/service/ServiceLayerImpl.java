@@ -2,6 +2,7 @@ package com.flooring.flooringmastery.service;
 import com.flooring.flooringmastery.dao.*;
 import com.flooring.flooringmastery.exceptions.PersistenceException;
 import com.flooring.flooringmastery.model.Order;
+import com.flooring.flooringmastery.exceptions.NoSuchOrderException;
 import com.flooring.flooringmastery.model.Product;
 import com.flooring.flooringmastery.model.Tax;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -180,14 +181,18 @@ public class ServiceLayerImpl implements ServiceLayer {
 
     }
 
-    public Order getOrder(LocalDate date, int orderNumber) throws PersistenceException {
-        return orderDao.getOrder(date, orderNumber);
+    public Order getOrder(LocalDate date, int orderNumber) throws PersistenceException, NoSuchOrderException {
+        Order o = orderDao.getOrder(date, orderNumber);
+        if (o == null) {
+            throw new NoSuchOrderException("Order " + orderNumber + " not found on " + date);
+        }
+        return o;
     }
     @Override
-    public void removeOrder(LocalDate date, int orderNumber) throws PersistenceException {
+    public void removeOrder(LocalDate date, int orderNumber) throws PersistenceException, NoSuchOrderException {
         Order removed = orderDao.removeOrder(date, orderNumber);
         if (removed == null) {
-            throw new PersistenceException("Order not found for that date and number.");
+            throw new NoSuchOrderException("Order " + orderNumber + " not found on " + date);
         }
         auditDao.writeAuditEntry("Order #" + orderNumber + " removed for date " + date);
     }

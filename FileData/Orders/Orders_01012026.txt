@@ -1,3 +1,5 @@
 OrderNumber,CustomerName,State,TaxRate,ProductType,Area,CostPerSquareFoot,LaborCostPerSquareFoot,MaterialCost,LaborCost,Tax,Total
 4,haha haha,TX,4.45,tile,101,3.50,4.15,353.50,419.15,34.382925,807.032925
 5,yep its me,KY,6.00,wood,4500,5.15,4.75,23175.00,21375.00,2673.0000,47223.0000
+6,hahah,KY,6.00,carpet,101,2.25,2.10,227.25,212.10,26.3610,465.7110
+7,Big man,WA,9.25,wood,150,5.15,4.75,772.50,712.50,137.362500,1622.362500

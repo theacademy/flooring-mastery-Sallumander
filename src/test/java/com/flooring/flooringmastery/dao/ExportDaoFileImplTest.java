@@ -26,7 +26,7 @@ class ExportDaoFileImplTest {
 
     @Test
     void testExportDataWritesFile() throws PersistenceException, IOException {
-        ExportDaoFileImpl exportDao = new ExportDaoFileImpl();
+    ExportDaoFileImpl exportDao = new ExportDaoFileImpl(new com.flooring.flooringmastery.view.UserIOConsoleImpl());
 
         // prepare a single order map
         Order o = new Order();

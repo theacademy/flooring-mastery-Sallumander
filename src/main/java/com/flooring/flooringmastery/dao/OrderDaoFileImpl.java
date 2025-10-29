@@ -106,24 +106,52 @@ public class OrderDaoFileImpl implements OrderDao {
 
             Map<Integer, Order> orders = new HashMap<>();
             for (String line : lines) {
-                String[] t = line.split(DELIMITER);
-                if (t.length < 12) continue;
+                String[] t = line.split(DELIMITER, -1);
 
                 Order order = new Order();
-                order.setOrderNumber(Integer.parseInt(t[0]));
+                // order number (required) - if missing, skip this line
+                if (t.length > 0 && t[0] != null && !t[0].isEmpty()) {
+                    try {
+                        order.setOrderNumber(Integer.parseInt(t[0]));
+                    } catch (NumberFormatException e) {
+                        // skip malformed order number
+                        continue;
+                    }
+                } else {
+                    continue; // cannot identify order without number
+                }
+
                 // set the order date from the file being read
                 order.setOrderDate(date);
-                order.setCustomerName(t[1]);
-                order.setState(t[2]);
-                order.setTaxRate(new BigDecimal(t[3]));
-                order.setProductType(t[4]);
-                order.setArea(new BigDecimal(t[5]));
-                order.setCostPerSquareFoot(new BigDecimal(t[6]));
-                order.setLaborCostPerSquareFoot(new BigDecimal(t[7]));
-                order.setMaterialCost(new BigDecimal(t[8]));
-                order.setLaborCost(new BigDecimal(t[9]));
-                order.setTax(new BigDecimal(t[10]));
-                order.setTotal(new BigDecimal(t[11]));
+
+                // optional fields - set if present
+                if (t.length > 1 && t[1] != null && !t[1].isEmpty()) order.setCustomerName(t[1]);
+                if (t.length > 2 && t[2] != null && !t[2].isEmpty()) order.setState(t[2]);
+                if (t.length > 3 && t[3] != null && !t[3].isEmpty()) {
+                    try { order.setTaxRate(new BigDecimal(t[3])); } catch (NumberFormatException ignored) {}
+                }
+                if (t.length > 4 && t[4] != null && !t[4].isEmpty()) order.setProductType(t[4]);
+                if (t.length > 5 && t[5] != null && !t[5].isEmpty()) {
+                    try { order.setArea(new BigDecimal(t[5])); } catch (NumberFormatException ignored) {}
+                }
+                if (t.length > 6 && t[6] != null && !t[6].isEmpty()) {
+                    try { order.setCostPerSquareFoot(new BigDecimal(t[6])); } catch (NumberFormatException ignored) {}
+                }
+                if (t.length > 7 && t[7] != null && !t[7].isEmpty()) {
+                    try { order.setLaborCostPerSquareFoot(new BigDecimal(t[7])); } catch (NumberFormatException ignored) {}
+                }
+                if (t.length > 8 && t[8] != null && !t[8].isEmpty()) {
+                    try { order.setMaterialCost(new BigDecimal(t[8])); } catch (NumberFormatException ignored) {}
+                }
+                if (t.length > 9 && t[9] != null && !t[9].isEmpty()) {
+                    try { order.setLaborCost(new BigDecimal(t[9])); } catch (NumberFormatException ignored) {}
+                }
+                if (t.length > 10 && t[10] != null && !t[10].isEmpty()) {
+                    try { order.setTax(new BigDecimal(t[10])); } catch (NumberFormatException ignored) {}
+                }
+                if (t.length > 11 && t[11] != null && !t[11].isEmpty()) {
+                    try { order.setTotal(new BigDecimal(t[11])); } catch (NumberFormatException ignored) {}
+                }
 
                 orders.put(order.getOrderNumber(), order);
             }
@@ -211,24 +239,39 @@ public class OrderDaoFileImpl implements OrderDao {
                 + "CostPerSquareFoot,LaborCostPerSquareFoot,MaterialCost,"
                 + "LaborCost,Tax,Total");
 
-        // Add order lines
-        for (Order order : orders.values()) {
-            String line = String.join(",",
-                    String.valueOf(order.getOrderNumber()),
-                    order.getCustomerName(),
-                    order.getState(),
-                    order.getTaxRate().toString(),
-                    order.getProductType(),
-                    order.getArea().toString(),
-                    order.getCostPerSquareFoot().toString(),
-                    order.getLaborCostPerSquareFoot().toString(),
-                    order.getMaterialCost().toString(),
-                    order.getLaborCost().toString(),
-                    order.getTax().toString(),
-                    order.getTotal().toString()
-            );
-            lines.add(line);
-        }
+    // Add order lines (null-safe: empty string if field is null)
+    for (Order order : orders.values()) {
+        //check every value isnt null before converting to string
+        //if value is null will be dealt with by service layer so unit tests still work
+        String orderNum = String.valueOf(order.getOrderNumber());
+        String cust = order.getCustomerName() == null ? "" : order.getCustomerName();
+        String state = order.getState() == null ? "" : order.getState();
+        String taxRate = order.getTaxRate() == null ? "" : order.getTaxRate().toString();
+        String product = order.getProductType() == null ? "" : order.getProductType();
+        String areaStr = order.getArea() == null ? "" : order.getArea().toString();
+        String costPerSq = order.getCostPerSquareFoot() == null ? "" : order.getCostPerSquareFoot().toString();
+        String laborPerSq = order.getLaborCostPerSquareFoot() == null ? "" : order.getLaborCostPerSquareFoot().toString();
+        String materialCost = order.getMaterialCost() == null ? "" : order.getMaterialCost().toString();
+        String laborCost = order.getLaborCost() == null ? "" : order.getLaborCost().toString();
+        String tax = order.getTax() == null ? "" : order.getTax().toString();
+        String total = order.getTotal() == null ? "" : order.getTotal().toString();
+
+        String line = String.join(",",
+            orderNum,
+            cust,
+            state,
+            taxRate,
+            product,
+            areaStr,
+            costPerSq,
+            laborPerSq,
+            materialCost,
+            laborCost,
+            tax,
+            total
+        );
+        lines.add(line);
+    }
 
         try {
             // Write all lines to the file (overwrites if exists)

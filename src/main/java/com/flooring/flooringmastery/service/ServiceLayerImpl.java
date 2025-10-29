@@ -44,7 +44,59 @@ public class ServiceLayerImpl implements ServiceLayer {
     }
 
     public void addOrder(LocalDate date, Order order) throws PersistenceException {
-        //Save to memory via DAO
+        // Basic validation of required fields
+        if (order == null) {
+            throw new PersistenceException("Order cannot be null");
+        }
+        if (order.getOrderDate() == null) {
+            order.setOrderDate(date);
+        }
+        if (order.getOrderDate() == null) {
+            throw new PersistenceException("Order date is required");
+        }
+        if (order.getCustomerName() == null || order.getCustomerName().trim().isEmpty()) {
+            throw new PersistenceException("Customer name is required");
+        }
+        if (!isValidName(order.getCustomerName())) {
+            throw new PersistenceException("Customer name is invalid");
+        }
+        if (order.getState() == null || order.getState().trim().isEmpty()) {
+            throw new PersistenceException("State is required");
+        }
+        if (!isValidState(order.getState())) {
+            throw new PersistenceException("State is invalid or unsupported");
+        }
+        if (order.getProductType() == null || order.getProductType().trim().isEmpty()) {
+            throw new PersistenceException("Product type is required");
+        }
+        if (!isValidProduct(order.getProductType())) {
+            throw new PersistenceException("Product type is invalid or unsupported");
+        }
+        if (order.getArea() == null || order.getArea().compareTo(new BigDecimal("100")) < 0) {
+            throw new PersistenceException("Area is required and must be at least 100");
+        }
+
+        // Ensure cost/tax fields are populated; if missing, try to refill from DAOs and recalculate
+        try {
+            if (order.getCostPerSquareFoot() == null || order.getLaborCostPerSquareFoot() == null) {
+                Product p = productDao.getProductByType(order.getProductType());
+                if (p == null) throw new PersistenceException("Product data not found for type: " + order.getProductType());
+                order.setCostPerSquareFoot(p.getCostPerSquareFoot());
+                order.setLaborCostPerSquareFoot(p.getLaborCostPerSquareFoot());
+            }
+            if (order.getTaxRate() == null) {
+                Tax t = taxDao.getTaxByState(order.getState());
+                if (t == null) throw new PersistenceException("Tax data not found for state: " + order.getState());
+                order.setTaxRate(t.getTaxRate());
+            }
+        } catch (PersistenceException e) {
+            throw e;
+        }
+
+        // Calculate derived fields (material,labor,tax,total)
+        calculateOrder(order);
+
+        // Save via DAO
         orderDao.addOrder(date, order);
    }
 

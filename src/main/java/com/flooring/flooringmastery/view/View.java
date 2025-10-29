@@ -34,6 +34,11 @@ public class View {
     }
 
     public void displayOrders(List<Order> orders) {
+        if (orders==null) {
+            io.print("No orders found.");
+            return;
+            
+        }
         io.print("===== Orders =====");
         for (Order o : orders) {
            displayOrder(o);
@@ -43,6 +48,11 @@ public class View {
     }
 
     public void displayOrder(Order order) {
+        if(order == null) {
+            io.print("Order not found.");
+            return;
+        }
+
         io.print(String.format(
                 "Order #%d\nCustomer: %s\nState: %s (Tax %.2f%%)\nProduct: %s\nArea: %.2f sq ft\nTotal: $%.2f\n",
                 order.getOrderNumber(),

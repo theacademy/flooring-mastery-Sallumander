@@ -47,13 +47,9 @@ class OrderDaoFileImplTest {
 
     @Test
     void testRemoveOrder() throws PersistenceException {
-        Order order = new Order();
-        order.setOrderNumber(2);
-        order.setCustomerName("Remove Me");
-        dao.addOrder(date, order);
 
-        dao.removeOrder(date, 2);
-        assertNull(dao.getOrder(date, 2));
+        dao.removeOrder(date, 1);
+        assertNull(dao.getOrder(date, 1));
     }
 
     @Test

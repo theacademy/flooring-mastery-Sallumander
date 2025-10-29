@@ -187,7 +187,7 @@ public class Controller {
 
 
     public void removeOrder() {
-        LocalDate date = view.getDateFromString("Enter order date (MM-DD-YYYY): ");
+        LocalDate date = view.getDateFromString("Enter order date (YYYY-MM-DD): ");
         int orderNumber = view.readInt("Enter order number to remove: ");
 
         try {

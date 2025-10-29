@@ -91,8 +91,8 @@ public class Controller {
         view.displayOrder(newOrder);
 
         // Ask user to confirm
-        String confirm = view.readString("Would you like to place this order? (Y/N): ").toLowerCase();
-        if (confirm.equals("y") || confirm.equals("yes")) {
+        
+        if (view.readYesNo("Would you like to place this order? (Y/N): ")) {
             // Add the order to storage
             service.addOrder(orderDate, newOrder);
             view.displayMessage("Order successfully added!");
@@ -176,9 +176,7 @@ public class Controller {
 
                 // Show summary and confirm
                 view.displayOrder(newOrder);
-                String confirm = view.readString("Save changes? (Y/N): ");
-
-                if (confirm.equalsIgnoreCase("y")) {
+                if (view.readYesNo("Save changes? (Y/N): ")) {
                     service.removeOrder(date, orderNum);
                     service.addOrder(date, newOrder);
                     view.displayMessage("Order successfully updated.");
@@ -205,9 +203,8 @@ public class Controller {
             }
 
             view.displayOrder(order);
-            String confirm = view.readString("Are you sure you want to delete this order? (Y/N): ");
-
-            if (confirm.equalsIgnoreCase("y")) {
+        
+            if (view.readYesNo("Are you sure you want to delete this order? (Y/N): ")) {
                 service.removeOrder(date, orderNumber);
                 view.displayMessage("Order successfully removed.");
             } else {

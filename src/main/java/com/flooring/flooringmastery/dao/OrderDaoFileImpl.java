@@ -88,6 +88,7 @@ public class OrderDaoFileImpl implements OrderDao {
         }
     }
 
+    //loads orders for a specific date from file into the ordersByDate map
     private void loadOrdersForDate(LocalDate date) throws PersistenceException {
         if (ordersByDate.containsKey(date)) return;
 
@@ -138,7 +139,9 @@ public class OrderDaoFileImpl implements OrderDao {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMddyyyy");
         return LocalDate.parse(datePart, formatter);
     }
+
     @Override
+    //generate next order number by finding max across all dates
     public int getNextOrderNumber() throws PersistenceException {
         int maxOrderNumber = 0;
 

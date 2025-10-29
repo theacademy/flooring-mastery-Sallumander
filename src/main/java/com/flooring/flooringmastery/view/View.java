@@ -78,4 +78,7 @@ public class View {
     public String readStringAllowEmpty(String prompt) {
         return io.readStringAllowEmpty(prompt);
     }
+    public boolean readYesNo(String prompt) {
+        return io.readYesNo(prompt);
+    }
 }

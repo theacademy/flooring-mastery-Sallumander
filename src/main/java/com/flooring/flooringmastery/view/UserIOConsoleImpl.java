@@ -104,6 +104,7 @@ public class UserIOConsoleImpl implements UserIO {
 
         }
     }
+    //used for edit so empty string will be allowed
     public String readStringAllowEmpty(String prompt){
         System.out.print(prompt);
         return console.nextLine();
